@@ -15,7 +15,7 @@ A comprehensive React-based dashboard for tracking project delivery status acros
 
 ## 🛠 Tech Stack
 
-- **Frontend**: React 19, TypeScript, Vite
+- **Frontend**: React 18, TypeScript, Vite
 - **Styling**: CSS Modules with CSS Variables for theming
 - **Icons**: Lucide React
 - **State Management**: React Context API
@@ -113,19 +113,14 @@ src/
 
 ### Successful Prompts:
 
-1. **"Create a comprehensive project delivery dashboard with role-based views for developers, PMs, and executives using React, TypeScript, and CSS modules"**
-   - Generated the initial project structure and component hierarchy
 
-2. **"Design a responsive Kanban board component for task management with drag-and-drop functionality and filtering"**
-   - Created the developer view with task cards and filtering system
-
-3. **"Build an executive dashboard with KPI cards, charts, and budget tracking using modern CSS animations"**
+1. **"Build an executive dashboard with KPI cards, charts, and budget tracking using modern CSS animations"**
    - Generated the executive view with metrics and data visualization
 
-4. **"Create a theme system with CSS variables supporting dark and light modes with smooth transitions"**
+2. **"Create a theme system with CSS variables supporting dark and light modes with smooth transitions"**
    - Implemented the theming system with persistent storage
 
-5. **"Design a comprehensive form system for adding projects and tasks with validation and responsive layout"**
+3. **"Design a comprehensive form system for adding projects and tasks with validation and responsive layout"**
    - Built the form components with proper validation
 
 ### Failed Prompt:
@@ -148,7 +143,7 @@ The state is structured hierarchically with projects containing milestones and t
 
 ### 2. What were your key design decisions for the UI/UX?
 
-- **Role-based navigation**: Clear visual distinction between user roles with dedicated views
+- **Role-based navigation**: Clear visual distinction between user roles with dedicated views. Designed in such a way that can scale easily in integration with the backend based on assigned roles.
 - **Progressive disclosure**: Information hierarchy that shows relevant details based on user needs
 - **Consistent visual language**: Unified color system, typography, and spacing
 - **Accessibility first**: Proper ARIA labels, keyboard navigation, and semantic HTML
@@ -165,11 +160,10 @@ The state is structured hierarchically with projects containing milestones and t
 ### 4. What would you improve with more time?
 
 - **Advanced animations**: More sophisticated transitions and micro-interactions
-- **Data persistence**: Local storage or IndexedDB for session persistence
 - **Advanced filtering**: Multi-criteria filtering with search functionality
 - **Drag-and-drop**: Kanban board with task reordering
 - **Performance optimization**: Virtual scrolling for large datasets
-- **Testing**: Comprehensive unit and integration tests
+
 
 ### 5. How does this scale for larger teams/projects?
 
