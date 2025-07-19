@@ -4,7 +4,7 @@ import { createContext, useContext, useState, useEffect, useCallback, type React
 import type { Project, Task, Milestone, TeamMember, ProjectContextType } from "../types"
 import { mockData } from "../data/mockData"
 import { apiClient, USE_MOCK_DATA } from "../services/api"
-import { LocalStorageService } from "../services/localstorage"
+import { LocalStorageService } from "../services/localStorage"
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined)
 
