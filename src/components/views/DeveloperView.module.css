@@ -4,6 +4,13 @@
   animation: fadeIn 0.5s ease-in-out;
 }
 
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
 .header {
   display: flex;
   justify-content: space-between;
@@ -36,22 +43,8 @@
   margin: 0.25rem 0 0 0;
 }
 
-.addButton {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  background: var(--primary);
-  color: white;
-  border-radius: var(--border-radius);
-  font-weight: 600;
-  transition: var(--transition);
-}
-
-.addButton:hover {
-  background: var(--primary-hover);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-hover);
+.errorMessage {
+  margin-bottom: 1rem;
 }
 
 .stats {

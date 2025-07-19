@@ -4,7 +4,22 @@ import type React from "react"
 
 import { useState } from "react"
 import { useProject } from "../contexts/ProjectContext"
-import { X } from "lucide-react"
+import {
+  Dialog,
+  DialogSurface,
+  DialogTitle,
+  DialogContent,
+  DialogBody,
+  DialogActions,
+  Button,
+  Input,
+  Textarea,
+  Dropdown,
+  Option,
+  Field,
+  Checkbox,
+} from "@fluentui/react-components"
+import { Dismiss24Regular } from "@fluentui/react-icons"
 import styles from "./ProjectForm.module.css"
 
 interface ProjectFormProps {
@@ -25,8 +40,9 @@ export function ProjectForm({ onClose }: ProjectFormProps) {
     priority: "medium" as const,
     teamMembers: [] as string[],
   })
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!formData.name || !formData.client || !formData.manager) {
@@ -34,176 +50,155 @@ export function ProjectForm({ onClose }: ProjectFormProps) {
       return
     }
 
-    addProject({
-      ...formData,
-      progress: 0,
-      spent: 0,
-      milestones: [],
-    })
-
-    onClose()
+    setIsSubmitting(true)
+    try {
+      await addProject({
+        ...formData,
+        progress: 0,
+        spent: 0,
+        milestones: [],
+      })
+      onClose()
+    } catch (error) {
+      console.error("Failed to add project:", error)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleChange = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
-  const handleTeamMemberToggle = (memberId: string) => {
+  const handleTeamMemberToggle = (memberId: string, checked: boolean) => {
     setFormData((prev) => ({
       ...prev,
-      teamMembers: prev.teamMembers.includes(memberId)
-        ? prev.teamMembers.filter((id) => id !== memberId)
-        : [...prev.teamMembers, memberId],
+      teamMembers: checked ? [...prev.teamMembers, memberId] : prev.teamMembers.filter((id) => id !== memberId),
     }))
   }
 
   return (
-    <div className={styles.overlay}>
-      <div className={styles.modal}>
-        <div className={styles.header}>
-          <h2 className={styles.title}>Create New Project</h2>
-          <button onClick={onClose} className={styles.closeButton}>
-            <X size={20} />
-          </button>
-        </div>
+    <Dialog open onOpenChange={(_, data) => !data.open && onClose()}>
+      <DialogSurface className={styles.dialogSurface}>
+        <DialogBody>
+          <DialogTitle
+            action={<Button appearance="subtle" aria-label="close" icon={<Dismiss24Regular />} onClick={onClose} />}
+          >
+            Create New Project
+          </DialogTitle>
+          <DialogContent>
+            <form onSubmit={handleSubmit} className={styles.form}>
+              <Field label="Project Name" required>
+                <Input
+                  value={formData.name}
+                  onChange={(e) => handleChange("name", e.target.value)}
+                  placeholder="Enter project name"
+                  required
+                />
+              </Field>
 
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Project Name *</label>
-            <input
-              type="text"
-              value={formData.name}
-              onChange={(e) => handleChange("name", e.target.value)}
-              className={styles.input}
-              placeholder="Enter project name"
-              required
-            />
-          </div>
+              <Field label="Description">
+                <Textarea
+                  value={formData.description}
+                  onChange={(e) => handleChange("description", e.target.value)}
+                  placeholder="Enter project description"
+                  rows={3}
+                />
+              </Field>
 
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Description</label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => handleChange("description", e.target.value)}
-              className={styles.textarea}
-              placeholder="Enter project description"
-              rows={3}
-            />
-          </div>
-
-          <div className={styles.formRow}>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Client *</label>
-              <input
-                type="text"
-                value={formData.client}
-                onChange={(e) => handleChange("client", e.target.value)}
-                className={styles.input}
-                placeholder="Enter client name"
-                required
-              />
-            </div>
-
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Project Manager *</label>
-              <select
-                value={formData.manager}
-                onChange={(e) => handleChange("manager", e.target.value)}
-                className={styles.select}
-                required
-              >
-                <option value="">Select manager</option>
-                {teamMembers
-                  .filter((member) => member.role.toLowerCase().includes("manager"))
-                  .map((member) => (
-                    <option key={member.id} value={member.id}>
-                      {member.name}
-                    </option>
-                  ))}
-              </select>
-            </div>
-          </div>
-
-          <div className={styles.formRow}>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Start Date</label>
-              <input
-                type="date"
-                value={formData.startDate}
-                onChange={(e) => handleChange("startDate", e.target.value)}
-                className={styles.input}
-              />
-            </div>
-
-            <div className={styles.formGroup}>
-              <label className={styles.label}>End Date</label>
-              <input
-                type="date"
-                value={formData.endDate}
-                onChange={(e) => handleChange("endDate", e.target.value)}
-                className={styles.input}
-              />
-            </div>
-          </div>
-
-          <div className={styles.formRow}>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Budget</label>
-              <input
-                type="number"
-                value={formData.budget}
-                onChange={(e) => handleChange("budget", Number(e.target.value))}
-                className={styles.input}
-                min="0"
-                step="1000"
-              />
-            </div>
-
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Priority</label>
-              <select
-                value={formData.priority}
-                onChange={(e) => handleChange("priority", e.target.value)}
-                className={styles.select}
-              >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-                <option value="critical">Critical</option>
-              </select>
-            </div>
-          </div>
-
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Team Members</label>
-            <div className={styles.teamGrid}>
-              {teamMembers.map((member) => (
-                <label key={member.id} className={styles.teamMember}>
-                  <input
-                    type="checkbox"
-                    checked={formData.teamMembers.includes(member.id)}
-                    onChange={() => handleTeamMemberToggle(member.id)}
-                    className={styles.checkbox}
+              <div className={styles.formRow}>
+                <Field label="Client" required>
+                  <Input
+                    value={formData.client}
+                    onChange={(e) => handleChange("client", e.target.value)}
+                    placeholder="Enter client name"
+                    required
                   />
-                  <div className={styles.memberInfo}>
-                    <span className={styles.memberName}>{member.name}</span>
-                    <span className={styles.memberRole}>{member.role}</span>
-                  </div>
-                </label>
-              ))}
-            </div>
-          </div>
+                </Field>
 
-          <div className={styles.actions}>
-            <button type="button" onClick={onClose} className={styles.cancelButton}>
+                <Field label="Project Manager" required>
+                  <Dropdown
+                    placeholder="Select manager"
+                    value={teamMembers.find((m) => m.id === formData.manager)?.name || ""}
+                    onOptionSelect={(_, data) => handleChange("manager", data.optionValue)}
+                  >
+                    {teamMembers
+                      .filter((member) => member.role.toLowerCase().includes("manager"))
+                      .map((member) => (
+                        <Option key={member.id} value={member.id}>
+                          {member.name}
+                        </Option>
+                      ))}
+                  </Dropdown>
+                </Field>
+              </div>
+
+              <div className={styles.formRow}>
+                <Field label="Start Date">
+                  <Input
+                    type="date"
+                    value={formData.startDate}
+                    onChange={(e) => handleChange("startDate", e.target.value)}
+                  />
+                </Field>
+
+                <Field label="End Date">
+                  <Input
+                    type="date"
+                    value={formData.endDate}
+                    onChange={(e) => handleChange("endDate", e.target.value)}
+                  />
+                </Field>
+              </div>
+
+              <div className={styles.formRow}>
+                <Field label="Budget">
+                  <Input
+                    type="number"
+                    value={formData.budget.toString()}
+                    onChange={(e) => handleChange("budget", Number(e.target.value))}
+                    min={0}
+                    step={1000}
+                  />
+                </Field>
+
+                <Field label="Priority">
+                  <Dropdown
+                    value={formData.priority}
+                    onOptionSelect={(_, data) => handleChange("priority", data.optionValue)}
+                  >
+                    <Option value="low">Low</Option>
+                    <Option value="medium">Medium</Option>
+                    <Option value="high">High</Option>
+                    <Option value="critical">Critical</Option>
+                  </Dropdown>
+                </Field>
+              </div>
+
+              <Field label="Team Members">
+                <div className={styles.teamGrid}>
+                  {teamMembers.map((member) => (
+                    <Checkbox
+                      key={member.id}
+                      label={`${member.name} - ${member.role}`}
+                      checked={formData.teamMembers.includes(member.id)}
+                      onChange={(_, data) => handleTeamMemberToggle(member.id, data.checked === true)}
+                    />
+                  ))}
+                </div>
+              </Field>
+            </form>
+          </DialogContent>
+          <DialogActions>
+            <Button appearance="secondary" onClick={onClose}>
               Cancel
-            </button>
-            <button type="submit" className={styles.submitButton}>
-              Create Project
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+            </Button>
+            <Button appearance="primary" onClick={handleSubmit} disabled={isSubmitting}>
+              {isSubmitting ? "Creating..." : "Create Project"}
+            </Button>
+          </DialogActions>
+        </DialogBody>
+      </DialogSurface>
+    </Dialog>
   )
 }

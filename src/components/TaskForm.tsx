@@ -2,7 +2,21 @@ import type React from "react"
 import { useState } from "react"
 import { useProject } from "../contexts/ProjectContext"
 import type { TaskStatus } from "../types"
-import { X } from "lucide-react"
+import {
+  Dialog,
+  DialogSurface,
+  DialogTitle,
+  DialogContent,
+  DialogBody,
+  DialogActions,
+  Button,
+  Input,
+  Textarea,
+  Dropdown,
+  Option,
+  Field,
+} from "@fluentui/react-components"
+import { Dismiss24Regular } from "@fluentui/react-icons"
 import styles from "./TaskForm.module.css"
 
 interface TaskFormProps {
@@ -22,8 +36,9 @@ export function TaskForm({ onClose }: TaskFormProps) {
     projectId: "",
     tags: "",
   })
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!formData.title || !formData.projectId || !formData.assignee) {
@@ -31,17 +46,23 @@ export function TaskForm({ onClose }: TaskFormProps) {
       return
     }
 
-    addTask({
-      ...formData,
-      actualHours: 0,
-      milestoneId: undefined,
-      tags: formData.tags
-        .split(",")
-        .map((tag) => tag.trim())
-        .filter(Boolean),
-    })
-
-    onClose()
+    setIsSubmitting(true)
+    try {
+      await addTask({
+        ...formData,
+        actualHours: 0,
+        milestoneId: undefined,
+        tags: formData.tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter(Boolean),
+      })
+      onClose()
+    } catch (error) {
+      console.error("Failed to add task:", error)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleChange = (field: string, value: any) => {
@@ -49,134 +70,111 @@ export function TaskForm({ onClose }: TaskFormProps) {
   }
 
   return (
-    <div className={styles.overlay}>
-      <div className={styles.modal}>
-        <div className={styles.header}>
-          <h2 className={styles.title}>Add New Task</h2>
-          <button onClick={onClose} className={styles.closeButton}>
-            <X size={20} />
-          </button>
-        </div>
+    <Dialog open onOpenChange={(_, data) => !data.open && onClose()}>
+      <DialogSurface className={styles.dialogSurface}>
+        <DialogBody>
+          <DialogTitle
+            action={<Button appearance="subtle" aria-label="close" icon={<Dismiss24Regular />} onClick={onClose} />}
+          >
+            Add New Task
+          </DialogTitle>
+          <DialogContent>
+            <form onSubmit={handleSubmit} className={styles.form}>
+              <Field label="Title" required>
+                <Input
+                  value={formData.title}
+                  onChange={(e) => handleChange("title", e.target.value)}
+                  placeholder="Enter task title"
+                  required
+                />
+              </Field>
 
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Title *</label>
-            <input
-              type="text"
-              value={formData.title}
-              onChange={(e) => handleChange("title", e.target.value)}
-              className={styles.input}
-              placeholder="Enter task title"
-              required
-            />
-          </div>
+              <Field label="Description">
+                <Textarea
+                  value={formData.description}
+                  onChange={(e) => handleChange("description", e.target.value)}
+                  placeholder="Enter task description"
+                  rows={3}
+                />
+              </Field>
 
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Description</label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => handleChange("description", e.target.value)}
-              className={styles.textarea}
-              placeholder="Enter task description"
-              rows={3}
-            />
-          </div>
+              <div className={styles.formRow}>
+                <Field label="Project" required>
+                  <Dropdown
+                    placeholder="Select project"
+                    value={projects.find((p) => p.id === formData.projectId)?.name || ""}
+                    onOptionSelect={(_, data) => handleChange("projectId", data.optionValue)}
+                  >
+                    {projects.map((project) => (
+                      <Option key={project.id} value={project.id}>
+                        {project.name}
+                      </Option>
+                    ))}
+                  </Dropdown>
+                </Field>
 
-          <div className={styles.formRow}>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Project *</label>
-              <select
-                value={formData.projectId}
-                onChange={(e) => handleChange("projectId", e.target.value)}
-                className={styles.select}
-                required
-              >
-                <option value="">Select project</option>
-                {projects.map((project) => (
-                  <option key={project.id} value={project.id}>
-                    {project.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+                <Field label="Assignee" required>
+                  <Dropdown
+                    placeholder="Select assignee"
+                    value={formData.assignee}
+                    onOptionSelect={(_, data) => handleChange("assignee", data.optionValue)}
+                  >
+                    {teamMembers.map((member) => (
+                      <Option key={member.id} value={member.name}>
+                        {member.name}
+                      </Option>
+                    ))}
+                  </Dropdown>
+                </Field>
+              </div>
 
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Assignee *</label>
-              <select
-                value={formData.assignee}
-                onChange={(e) => handleChange("assignee", e.target.value)}
-                className={styles.select}
-                required
-              >
-                <option value="">Select assignee</option>
-                {teamMembers.map((member) => (
-                  <option key={member.id} value={member.name}>
-                    {member.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
+              <div className={styles.formRow}>
+                <Field label="Priority">
+                  <Dropdown
+                    value={formData.priority}
+                    onOptionSelect={(_, data) => handleChange("priority", data.optionValue)}
+                  >
+                    <Option value="low">Low</Option>
+                    <Option value="medium">Medium</Option>
+                    <Option value="high">High</Option>
+                    <Option value="critical">Critical</Option>
+                  </Dropdown>
+                </Field>
 
-          <div className={styles.formRow}>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Priority</label>
-              <select
-                value={formData.priority}
-                onChange={(e) => handleChange("priority", e.target.value)}
-                className={styles.select}
-              >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-                <option value="critical">Critical</option>
-              </select>
-            </div>
+                <Field label="Estimated Hours">
+                  <Input
+                    type="number"
+                    value={formData.estimatedHours.toString()}
+                    onChange={(e) => handleChange("estimatedHours", Number(e.target.value))}
+                    min={0.5}
+                    step={0.5}
+                  />
+                </Field>
+              </div>
 
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Estimated Hours</label>
-              <input
-                type="number"
-                value={formData.estimatedHours}
-                onChange={(e) => handleChange("estimatedHours", Number(e.target.value))}
-                className={styles.input}
-                min="0.5"
-                step="0.5"
-              />
-            </div>
-          </div>
+              <Field label="Due Date">
+                <Input type="date" value={formData.dueDate} onChange={(e) => handleChange("dueDate", e.target.value)} />
+              </Field>
 
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Due Date</label>
-            <input
-              type="date"
-              value={formData.dueDate}
-              onChange={(e) => handleChange("dueDate", e.target.value)}
-              className={styles.input}
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Tags</label>
-            <input
-              type="text"
-              value={formData.tags}
-              onChange={(e) => handleChange("tags", e.target.value)}
-              className={styles.input}
-              placeholder="Enter tags separated by commas"
-            />
-          </div>
-
-          <div className={styles.actions}>
-            <button type="button" onClick={onClose} className={styles.cancelButton}>
+              <Field label="Tags">
+                <Input
+                  value={formData.tags}
+                  onChange={(e) => handleChange("tags", e.target.value)}
+                  placeholder="Enter tags separated by commas"
+                />
+              </Field>
+            </form>
+          </DialogContent>
+          <DialogActions>
+            <Button appearance="secondary" onClick={onClose}>
               Cancel
-            </button>
-            <button type="submit" className={styles.submitButton}>
-              Add Task
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+            </Button>
+            <Button appearance="primary" onClick={handleSubmit} disabled={isSubmitting}>
+              {isSubmitting ? "Adding..." : "Add Task"}
+            </Button>
+          </DialogActions>
+        </DialogBody>
+      </DialogSurface>
+    </Dialog>
   )
 }

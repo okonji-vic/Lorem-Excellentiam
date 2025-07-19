@@ -1,7 +1,9 @@
 "use client"
 
 import { useTheme } from "../contexts/ThemeContext"
-import { Sun, Moon, Activity } from "lucide-react"
+import { Activity } from "lucide-react"
+import { Button } from "@fluentui/react-components"
+import { WeatherSunny24Regular, WeatherMoon24Regular } from "@fluentui/react-icons"
 import styles from "./Header.module.css"
 
 export function Header() {
@@ -15,9 +17,12 @@ export function Header() {
       </div>
 
       <div className={styles.actions}>
-        <button onClick={toggleTheme} className={styles.themeToggle} aria-label="Toggle theme">
-          {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
-        </button>
+        <Button
+          appearance="subtle"
+          icon={theme === "light" ? <WeatherMoon24Regular /> : <WeatherSunny24Regular />}
+          onClick={toggleTheme}
+          aria-label="Toggle theme"
+        />
       </div>
     </header>
   )

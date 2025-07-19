@@ -65,13 +65,18 @@ export interface ProjectContextType {
   tasks: Task[]
   milestones: Milestone[]
   teamMembers: TeamMember[]
-  addProject: (project: Omit<Project, "id">) => void
-  updateProject: (id: string, updates: Partial<Project>) => void
-  addTask: (task: Omit<Task, "id" | "createdAt" | "updatedAt">) => void
-  updateTask: (id: string, updates: Partial<Task>) => void
-  addMilestone: (milestone: Omit<Milestone, "id">) => void
-  updateMilestone: (id: string, updates: Partial<Milestone>) => void
+  loading: boolean
+  error: string | null
+  addProject: (project: Omit<Project, "id">) => Promise<void>
+  updateProject: (id: string, updates: Partial<Project>) => Promise<void>
+  addTask: (task: Omit<Task, "id" | "createdAt" | "updatedAt">) => Promise<void>
+  updateTask: (id: string, updates: Partial<Task>) => Promise<void>
+  addMilestone: (milestone: Omit<Milestone, "id">) => Promise<void>
+  updateMilestone: (id: string, updates: Partial<Milestone>) => Promise<void>
+  addTeamMember: (member: Omit<TeamMember, "id">) => Promise<void>
+  updateTeamMember: (id: string, updates: Partial<TeamMember>) => Promise<void>
   getProjectTasks: (projectId: string) => Task[]
   getProjectMilestones: (projectId: string) => Milestone[]
   getMilestoneProgress: (milestoneId: string) => number
+  refreshData: () => void
 }
