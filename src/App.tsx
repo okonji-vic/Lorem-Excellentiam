@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { RoleSelector } from "./components/RoleSelector"
 import { DeveloperView } from "./components/views/DeveloperView"
 import { PMView } from "./components/views/PMView"
@@ -14,6 +14,12 @@ import styles from "./App.module.css"
 function AppContent() {
   const [currentRole, setCurrentRole] = useState<UserRole>("developer")
   const { theme } = useTheme()
+  const mainRef = useRef<HTMLDivElement>(null)
+
+  //  scroll to top anytime the role changes
+  useEffect(() => {
+    mainRef.current?.scrollTo({ top: 0, behavior: "smooth" })
+  }, [currentRole])
 
   const renderView = () => {
     switch (currentRole) {
@@ -34,7 +40,7 @@ function AppContent() {
         <Header />
         <div className={styles.content}>
           <RoleSelector currentRole={currentRole} onRoleChange={setCurrentRole} />
-          <main className={styles.main}>{renderView()}</main>
+          <main ref={mainRef} className={styles.main}>{renderView()}</main>
         </div>
       </div>
     </FluentProvider>

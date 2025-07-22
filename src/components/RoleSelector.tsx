@@ -42,7 +42,12 @@ export function RoleSelector({ currentRole, onRoleChange }: RoleSelectorProps) {
           return (
             <button
               key={role}
-              onClick={() => onRoleChange(role as UserRole)}
+              onClick={() => {
+                if (currentRole !== role) {
+                  onRoleChange(role as UserRole)
+                  window.scrollTo({ top: 0, behavior: "smooth" }) // Smooth scroll to top on role change
+                }
+              }}
               className={`${styles.roleButton} ${isActive ? styles.active : ""}`}
               aria-pressed={isActive}
             >

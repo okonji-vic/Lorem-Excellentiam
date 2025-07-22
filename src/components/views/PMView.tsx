@@ -31,7 +31,7 @@ export function PMView() {
   useEffect(() => {
     const interval = setInterval(() => {
       refreshData()
-    }, 30000) // Refresh every 30 seconds
+    }, 300000) // Refresh every 5 minutes
 
     return () => clearInterval(interval)
   }, [refreshData])
