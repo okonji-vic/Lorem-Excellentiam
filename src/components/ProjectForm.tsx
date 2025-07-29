@@ -1,7 +1,5 @@
-"use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useProject } from "../contexts/ProjectContext"
 import {

@@ -113,23 +113,32 @@ export function DeveloperView() {
       />
 
       <div className={styles.kanban}>
-        {Object.entries(tasksByStatus).map(([status, statusTasks]) => (
-          <div key={status} className={styles.column}>
-            <div className={styles.columnHeader}>
-              <h3 className={styles.columnTitle}>
-                {status.replace("-", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
-              </h3>
-              <span className={styles.taskCount}>{statusTasks.length}</span>
-            </div>
+  {Object.entries(tasksByStatus).map(([status, statusTasks]) => {
+    console.log(status, statusTasks);
 
-            <div className={styles.taskList}>
-              {statusTasks.map((task) => (
-                <TaskCard key={`${task.id}-${refreshKey}`} task={task} />
-              ))}
-            </div>
-          </div>
-        ))}
+    // Skip rendering this column if it doesn't match the filter
+    if (statusFilter !== "all" && status !== statusFilter) {
+      return null; // Don't render this column
+    }
+    return (
+      <div key={status} className={styles.column}>
+        <div className={styles.columnHeader}>
+          <h3 className={styles.columnTitle}>
+            {status.replace("-", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+          </h3>
+          <span className={styles.taskCount}>{statusTasks.length}</span>
+        </div>
+
+        <div className={styles.taskList}>
+          {statusTasks.map((task) => (
+            <TaskCard key={`${task.id}-${refreshKey}`} task={task} />
+          ))}
+        </div>
       </div>
+    );
+  })}
+</div>
+
 
       {showTaskForm && <TaskForm onClose={() => setShowTaskForm(false)} />}
     </div>
