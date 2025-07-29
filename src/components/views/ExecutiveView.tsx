@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react"
 import { useProject } from "../../contexts/ProjectContext"
 import { MetricCard } from "../MetricCard"
@@ -28,6 +27,9 @@ export function ExecutiveView() {
   const budgetUtilization = Math.round((totalSpent / totalBudget) * 100)
 
   const completedProjects = projects.filter((p) => p.status === "completed").length
+  console.log("Completed Projects:", completedProjects)
+  console.log("Total Projects:", projects.length)
+  console.log("Project Completion Rate:", (completedProjects / projects.length) * 100)
   const activeProjects = projects.filter((p) => p.status === "active").length
   const projectCompletionRate = Math.round((completedProjects / projects.length) * 100)
 
